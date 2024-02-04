@@ -1,23 +1,15 @@
-/*
- *<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<    TIMER_private.h   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- *
- *  Author : Mahmoud Karem Zamel
- *  Layer  : MCAL
- *  SWC    : TIMER
- *
- */ 
+
  
 #ifndef TIMER_PRIVATE_H_
 #define TIMER_PRIVATE_H_
 
-	/*  REG Bits */
 
 	#define TIMSK_TOIE0		0
 	#define TIMSK_OCIE0		1
 	#define TIMSK_TOIE1		2
-	#define TIMSK_OCIE1B	3
-	#define TIMSK_OCIE1A	4
-	#define TIMSK_TICIE1	5
+	#define TIMSK_OCIE1B	        3
+	#define TIMSK_OCIE1A	        4
+	#define TIMSK_TICIE1	        5
 	#define TIMSK_TOIE2		6
 	#define TIMSK_OCIE2		7
 
@@ -30,18 +22,16 @@
 	#define TIFR_TOV2		6
 	#define TIFR_OCV2		7
 
-	/*Timer0*/
-	#define TCCR0_FOC0      7
+	#define TCCR0_FOC0              7
 	#define TCCR0_WGM00		6
 	#define TCCR0_COM01		5
 	#define TCCR0_COM00		4
 	#define TCCR0_WGM01		3
-	#define TCCR0_CS02      2
+	#define TCCR0_CS02              2
 	#define TCCR0_CS01		1
 	#define TCCR0_CS00		0
 
 
-	/*Timer1*/
 
 	#define TCCR1A_COM1A1		7
 	#define TCCR1A_COM1A0		6
@@ -56,7 +46,6 @@
 	#define TCCR1B_WGM12		3
 
 
-	/*Timer2*/
 
 	#define TCCR2_WGM20		6
 	#define TCCR2_COM21		5
@@ -80,7 +69,7 @@
 	#define TIMER_T0_EXTERNAL_CLOCK_SOURCE_FALLING	        6
 	#define TIMER_T0_EXTERNAL_CLOCK_SOURCE_RISING	        7
 
-	#define TIMER_PRESCALER_MASK					        0b11111000 /* This Value also could use for bit masking */
+	#define TIMER_PRESCALER_MASK					        0b11111000 
 
 	#define TIMER_NORMAL_MODE						        0
 	#define TIMER_PWM_MODE							        1
@@ -117,14 +106,12 @@
 	#define TIMER_u8_ICP_RAISING_EDGE                   1
 
 
-	/* WDTCR Bits */
 	#define		WDTCR_WDTOE 			4
 	#define		WDTCR_WDE				3
 	#define		WDTCR_WDP2				2
 	#define		WDTCR_WDP1				1
 	#define		WDTCR_WDP0				0
 
-	/* WDT Prescaler select  */
 	#define		WDT_PS_MASKING				0b11111000
 	#define		WDT_PS_16_3_MS				0
 	#define		WDT_PS_32_5_MS	    		1

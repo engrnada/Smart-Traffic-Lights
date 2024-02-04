@@ -1,38 +1,25 @@
-/*
- *<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<    TIMER_program.c   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- *
- *  Author : Mahmoud Karem Zamel
- *  Layer  : MCAL
- *  SWC    : Timer
- *
- */ 
- 
+
 #include "../../LIB/STD_TYPES.h"
 #include "../../LIB/BIT_MATH.h"
 
 #include "TIMER_interface.h"
-#include "TIMER_private.h" /*You have to include TIMER_private.h before TIMER_config.h*/
+#include "TIMER_private.h" 
 #include "TIMER_config.h"
 #include "TIMER_register.h"
 
-/*Global Pointer to array of Function to Hold the Call Back Function Address for Timer*/
-static void (*TIMERS_pvCallBackFunc[16])(void) = {NULL} ;  /* we have 8 interrupt sources in timer  */
+
+static void (*TIMERS_pvCallBackFunc[16])(void) = {NULL} ; 
 
 
-/*******************************************************************************************************************/
 void TIMER0_voidInit(void)
 {
-	/*Set Configurable Modes*/
 		#if TIMER0_WAVEFORM_GENERATION_MODE == TIMER_NORMAL_MODE
 
-			/*Initialize Waveform Generation Mode as Normal Mode*/
 			CLR_BIT(TCCR0 , TCCR0_WGM00) ;
 			CLR_BIT(TCCR0 , TCCR0_WGM01) ;
 
-			/*Set the Required Preload Value*/
 			TCNT0 = TIMER0_PRELOAD_VAL ;
 
-			/*Timer0 Overflow Interrupt Enable*/
 			#if TIMER0_OVERFLOW_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_TOIE0) ;
 			#elif TIMER0_OVERFLOW_INTERRUPT == ENABLE
@@ -42,11 +29,9 @@ void TIMER0_voidInit(void)
 			#endif
 
 		#elif TIMER0_WAVEFORM_GENERATION_MODE == TIMER_PWM_MODE
-			/*Initialize Waveform Generation Mode as PWM Mode*/
 			SET_BIT(TCCR0 , TCCR0_WGM00) ;
 			CLR_BIT(TCCR0 , TCCR0_WGM01) ;
 
-			/*Set CTC PWM MODE*/
 			#if TIMER0_CTC_PWM_MODE == TIMER_OC_DISCONNECTED
 					CLR_BIT(TCCR0 , TCCR0_COM00) ;
 					CLR_BIT(TCCR0 , TCCR0_COM01) ;
@@ -60,19 +45,15 @@ void TIMER0_voidInit(void)
 					#error "Wrong TIMER0_CTC_PWM_MODE Config"
 			#endif
 
-			/*Set the Required CTC Value*/
 			OCR0 = TIMER0_CTC_VAL ;
 
 		#elif TIMER0_WAVEFORM_GENERATION_MODE == TIMER_CTC_MODE
 
-			/*Initialize Waveform Generation Mode as CTC Mode*/
 			CLR_BIT(TCCR0 , TCCR0_WGM00) ;
 			SET_BIT(TCCR0 , TCCR0_WGM01) ;
 
-			/*Set the Required CTC Value*/
 			OCR0 = TIMER0_CTC_VAL ;
 
-			/*Timer0 Compare Match Interrupt Enable*/
 			#if TIMER0_CTC_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_OCIE0) ;
 			#elif TIMER0_CTC_INTERRUPT == ENABLE
@@ -83,11 +64,9 @@ void TIMER0_voidInit(void)
 
 		#elif TIMER0_WAVEFORM_GENERATION_MODE == TIMER_FAST_PWM_MODE
 
-			/*Initialize Waveform Generation Mode as Fast PWM Mode*/
 			SET_BIT(TCCR0 , TCCR0_WGM00) ;
 			SET_BIT(TCCR0 , TCCR0_WGM01) ;
 
-			/*Set CTC Fast PWM MODE*/
 			#if TIMER0_CTC_PWM_MODE == TIMER_OC_DISCONNECTED
 					CLR_BIT(TCCR0 , TCCR0_COM00) ;
 					CLR_BIT(TCCR0 , TCCR0_COM01) ;
@@ -101,7 +80,6 @@ void TIMER0_voidInit(void)
 					#error "Wrong TIMER0_CTC_PWM_MODE Config"
 			#endif
 
-			/*Set the Required CTC Value*/
 			OCR0 = TIMER0_CTC_VAL ;
 
 		#else
@@ -109,7 +87,6 @@ void TIMER0_voidInit(void)
 
 		#endif
 
-	/*Set the Required Prescaler*/
 	TCCR0 &= TIMER_PRESCALER_MASK ;
 	TCCR0 |= TIMER0_PRESCALER ;
 }
@@ -117,20 +94,16 @@ void TIMER0_voidInit(void)
 void TIMER1_voidInit(void)
 {
 
-	/*Set Configurable Modes*/
 
 		#if TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_NORMAL_MODE
 
-			/*Set Waveform generation mode as Normal mode */
 			CLR_BIT(TCCR1A,TCCR1A_WGM10);
 			CLR_BIT(TCCR1A,TCCR1A_WGM11);
 			CLR_BIT(TCCR1B,TCCR1B_WGM12);
 			CLR_BIT(TCCR1B,TCCR1B_WGM13);
 
-			/*Set the require Preload Value*/
 			TCNT1 = TIMER1_PRELOAD_VAL ;
 
-			/*Timer1 Overflow Interrupt Enable*/
 			#if TIMER1_OVERFLOW_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_TOIE1) ;
 			#elif TIMER1_OVERFLOW_INTERRUPT == ENABLE
@@ -141,7 +114,6 @@ void TIMER1_voidInit(void)
 
 		#elif (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_CTC_OCR1A_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_CTC_ICR1_MODE)
 
-			/*Set Waveform generation mode as CTC modes */
 			#if TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_CTC_ICR1_MODE
 				CLR_BIT(TCCR1A,TCCR1A_WGM10);
 				CLR_BIT(TCCR1A,TCCR1A_WGM11);
@@ -156,11 +128,9 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_WAVEFORM_GENERATION_MODE Config"
 			#endif
 
-			/*Set the require CTC Values*/
 			OCR1A = TIMER1_CTCA_VAL ;
 			OCR1B = TIMER1_CTCB_VAL ;
 
-			/*Set ICR1 if TIMER1_CTC_OCR1A_MODE = TIMER1_CTC_ICR1_MODE*/
 			#if TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_CTC_ICR1_MODE
 				ICR1 = TIMER1_ICR1_VAL ;
 
@@ -176,7 +146,6 @@ void TIMER1_voidInit(void)
 				/*Do nothing*/
 			#endif
 
-			/*Set OCR1A mode*/
 			#if TIMER1_OCR1A_MODE == TIMER_OC_DISCONNECTED
 				CLR_BIT(TCCR1A , TCCR1A_COM1A0) ;
 				CLR_BIT(TCCR1A , TCCR1A_COM1A1) ;
@@ -193,7 +162,6 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_OCR1A_MODE Config"
 			#endif
 
-			/*Set OCR1B mode*/
 			#if TIMER1_OCR1B_MODE == TIMER_OC_DISCONNECTED
 				CLR_BIT(TCCR1A , TCCR1A_COM1B0) ;
 				CLR_BIT(TCCR1A , TCCR1A_COM1B1) ;
@@ -210,7 +178,6 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_OCR1B_MODE Config"
 			#endif
 
-			/*Timer1 CTC Interrupt Enable*/
 			#if TIMER1_CTCA_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_OCIE1A) ;
 			#elif TIMER1_CTCA_INTERRUPT == ENABLE
@@ -229,7 +196,6 @@ void TIMER1_voidInit(void)
 
 		#elif (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_CORRECT_OCR1A_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_CORRECT_ICR1_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_AND_FREQ_CORRECT_OCR1A_MODE) ||(TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_AND_FREQ_CORRECT_ICR1_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_10_BIT_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_9_BIT_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_8_BIT_MODE)
 
-			/*Set Waveform generation mode as PWM modes */
 			#if TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_CORRECT_OCR1A_MODE
 				SET_BIT(TCCR1A,TCCR1A_WGM10);
 				SET_BIT(TCCR1A,TCCR1A_WGM11);
@@ -269,11 +235,9 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_WAVEFORM_GENERATION_MODE Config"
 			#endif
 
-			/*Set the require CTC Values*/
 			OCR1A = TIMER1_CTCA_VAL ;
 			OCR1B = TIMER1_CTCB_VAL ;
 
-			/*Set ICR1*/
 			#if ((TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_CORRECT_ICR1_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_PWM_PHASE_AND_FREQ_CORRECT_ICR1_MODE))
 				ICR1 = TIMER1_ICR1_VAL ;
 
@@ -288,7 +252,6 @@ void TIMER1_voidInit(void)
 				/*Do nothing*/
 			#endif
 
-			/*Set OCR1A mode*/
 			#if TIMER1_OCR1A_MODE == TIMER_OC_DISCONNECTED
 				CLR_BIT(TCCR1A , TCCR1A_COM1A0) ;
 				CLR_BIT(TCCR1A , TCCR1A_COM1A1) ;
@@ -302,7 +265,6 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_OCR1A_MODE Config"
 			#endif
 
-			/*Set OCR1B mode*/
 			#if TIMER1_OCR1B_MODE == TIMER_OC_DISCONNECTED
 				CLR_BIT(TCCR1A , TCCR1A_COM1B0) ;
 				CLR_BIT(TCCR1A , TCCR1A_COM1B1) ;
@@ -316,7 +278,6 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_OCR1B_MODE Config"
 			#endif
 
-			/*Timer1 PWM Interrupt Enable*/
 			#if TIMER1_OVERFLOW_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_TOIE1) ;
 			#elif TIMER1_OVERFLOW_INTERRUPT == ENABLE
@@ -352,7 +313,6 @@ void TIMER1_voidInit(void)
 
 		#elif (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_OCR1A_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_ICR1_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_10_BIT_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_9_BIT_MODE) || (TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_8_BIT_MODE)
 
-			/*Set Waveform generation mode as PWM modes */
 			#if TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_OCR1A_MODE
 				SET_BIT(TCCR1A,TCCR1A_WGM10);
 				SET_BIT(TCCR1A,TCCR1A_WGM11);
@@ -382,11 +342,9 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_WAVEFORM_GENERATION_MODE Config"
 			#endif
 
-			/*Set the require CTC Values*/
 			OCR1A = TIMER1_CTCA_VAL ;
 			OCR1B = TIMER1_CTCB_VAL ;
 
-			/*Set ICR1*/
 			#if TIMER1_WAVEFORM_GENERATION_MODE == TIMER1_FAST_PWM_ICR1_MODE
 				ICR1 = TIMER1_ICR1_VAL ;
 
@@ -401,7 +359,6 @@ void TIMER1_voidInit(void)
 				/*Do nothing*/
 			#endif
 
-			/*Set OCR1A mode*/
 			#if TIMER1_OCR1A_MODE == TIMER_OC_DISCONNECTED
 				CLR_BIT(TCCR1A , TCCR1A_COM1A0) ;
 				CLR_BIT(TCCR1A , TCCR1A_COM1A1) ;
@@ -415,7 +372,6 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_OCR1A_MODE Config"
 			#endif
 
-			/*Set OCR1B mode*/
 			#if TIMER1_OCR1B_MODE == TIMER_OC_DISCONNECTED
 				CLR_BIT(TCCR1A , TCCR1A_COM1B0) ;
 				CLR_BIT(TCCR1A , TCCR1A_COM1B1) ;
@@ -429,7 +385,6 @@ void TIMER1_voidInit(void)
 				#error "Wrong TIMER1_OCR1B_MODE Config"
 			#endif
 
-			/*Timer1 PWM Interrupt Enable*/
 			#if TIMER1_OVERFLOW_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_TOIE1) ;
 			#elif TIMER1_OVERFLOW_INTERRUPT == ENABLE
@@ -465,7 +420,6 @@ void TIMER1_voidInit(void)
 			#error "Wrong TIMER1_WAVEFORM_GENERATION_MODE Config"
 		#endif
 
-	/*Set the Required Prescaler*/
 	TCCR1B &= TIMER_PRESCALER_MASK ;
 	TCCR1B |= TIMER1_PRESCALER ;
 
@@ -474,17 +428,13 @@ void TIMER1_voidInit(void)
 
 void TIMER2_voidInit(void)
 {
-	/*Set Configurable Modes*/
 		#if TIMER2_WAVEFORM_GENERATION_MODE == TIMER_NORMAL_MODE
 
-			/*Initialize Waveform Generation Mode as Normal Mode*/
 			CLR_BIT(TCCR2 , TCCR2_WGM20) ;
 			CLR_BIT(TCCR2 , TCCR2_WGM21) ;
 
-			/*Set the Required Preload Value*/
 			TCNT2 = TIMER2_PRELOAD_VAL ;
 
-			/*Timer2 Overflow Interrupt Enable*/
 			#if TIMER2_OVERFLOW_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_TOIE2) ;
 			#elif TIMER2_OVERFLOW_INTERRUPT == ENABLE
@@ -494,11 +444,9 @@ void TIMER2_voidInit(void)
 			#endif
 
 		#elif TIMER2_WAVEFORM_GENERATION_MODE == TIMER_PWM_MODE
-			/*Initialize Waveform Generation Mode as PWM Mode*/
 			SET_BIT(TCCR2 , TCCR2_WGM20) ;
 			CLR_BIT(TCCR2 , TCCR2_WGM21) ;
 
-			/*Set CTC PWM MODE*/
 			#if TIMER2_CTC_PWM_MODE == TIMER_OC_DISCONNECTED
 					CLR_BIT(TCCR2 , TCCR2_COM20) ;
 					CLR_BIT(TCCR2 , TCCR2_COM21) ;
@@ -512,19 +460,15 @@ void TIMER2_voidInit(void)
 					#error "Wrong TIMER2_CTC_PWM_MODE Config"
 			#endif
 
-			/*Set the Required CTC Value*/
 			OCR2 = TIMER2_CTC_VAL ;
 
 		#elif TIMER2_WAVEFORM_GENERATION_MODE == TIMER_CTC_MODE
 
-			/*Initialize Waveform Generation Mode as CTC Mode*/
 			CLR_BIT(TCCR2 , TCCR2_WGM20) ;
 			SET_BIT(TCCR2 , TCCR2_WGM21) ;
 
-			/*Set the Required CTC Value*/
 			OCR2 = TIMER2_CTC_VAL ;
 
-			/*Timer2 Compare Match Interrupt Enable*/
 			#if TIMER2_CTC_INTERRUPT == DISABLE
 				CLR_BIT(TIMSK , TIMSK_OCIE2) ;
 			#elif TIMER2_CTC_INTERRUPT == ENABLE
@@ -535,11 +479,9 @@ void TIMER2_voidInit(void)
 
 		#elif TIMER2_WAVEFORM_GENERATION_MODE == TIMER_FAST_PWM_MODE
 
-			/*Initialize Waveform Generation Mode as Fast PWM Mode*/
 			SET_BIT(TCCR2 , TCCR2_WGM20) ;
 			SET_BIT(TCCR2 , TCCR2_WGM21) ;
 
-			/*Set CTC Fast PWM MODE*/
 			#if TIMER2_CTC_PWM_MODE == TIMER_OC_DISCONNECTED
 					CLR_BIT(TCCR2 , TCCR2_COM20) ;
 					CLR_BIT(TCCR2 , TCCR2_COM21) ;
@@ -553,7 +495,6 @@ void TIMER2_voidInit(void)
 					#error "Wrong TIMER2_CTC_PWM_MODE Config"
 			#endif
 
-			/*Set the Required CTC Value*/
 			OCR2 = TIMER2_CTC_VAL ;
 
 		#else
@@ -561,12 +502,10 @@ void TIMER2_voidInit(void)
 
 		#endif
 
-	/*Set the Required Prescaler*/
 	TCCR2 &= TIMER_PRESCALER_MASK ;
 	TCCR2 |= TIMER2_PRESCALER ;
 }
 
-/*******************************************************************************************************************/
 void TIMER0_voidSetPreload (u8 Copy_u8Preload)
 {
 	TCNT0 = Copy_u8Preload ;
@@ -623,42 +562,29 @@ u8 TIMER2_u8GetTimerCounterValue (void)
 	return TCNT2 ;
 }
 
-/*******************************************************************************************************************/
 
 void TIMER_voidSetPWM(u16 Copy_u16CompareValue)
 {
 	OCR1A = Copy_u16CompareValue;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-/*
-	Hint : This func for initial state of trigger (prebuild)
-*/
+
 void TIMER_voidICUInitEnable(void)
 {
-	/* Set trigger source as rising edge Initially  */
 	#if (TIMER_u8_ICP_INIT_STATE == TIMER_u8_ICP_RAISING_EDGE)
 		SET_BIT(TCCR1B,TCCR1B_ICES1);
 	#elif(TIMER_u8_ICP_INIT_STATE == TIMER_u8_ICP_FALLING_EDGE)
 		CLR_BIT(TCCR1B,TCCR1B_ICES1);
 	#endif
 	
-	/* Enable Interrupt of ICU */
 	SET_BIT(TIMSK,TIMSK_TICIE1);
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-/*
-	Hint : This func for change the trigger state (postbuild)
-	Options :-
-	 1- TIMER_u8_ICP_RAISING_EDGE
-	 2- TIMER_u8_ICP_FALLING_EDGE
-*/
+
 u8 TIMER_voidICUSetTriggerEdge(u8 Copy_u8Edge)
 {
 	u8 Local_u8ErrorStatus = OK ;
 	
-	/* Change The trigger source as Rising edge or Falling edge */
 	if (Copy_u8Edge == TIMER_u8_ICP_RAISING_EDGE)
 	{
 		SET_BIT(TCCR1B,TCCR1B_ICES1);
@@ -675,7 +601,6 @@ u8 TIMER_voidICUSetTriggerEdge(u8 Copy_u8Edge)
 	
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 void TIMER_voidICUEnableInterrupt(void)
 {
@@ -683,21 +608,19 @@ void TIMER_voidICUEnableInterrupt(void)
 }
 
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 void TIMER_voidICUDisableInterrupt(void)
 {
 	CLR_BIT(TIMSK,TIMSK_TICIE1);
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 u16 TIMER_u16GetICR(void)
 {
 	return ICR1;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
 /*
 u8   TIMER_u8GetPWMOnPeriod   (u16 * Copy_pu16OnPeriod)
 {
@@ -737,36 +660,27 @@ u8   TIMER_u8GetPWMDutyCycle  (u8  * Copy_pu8DutyCycle)
 }
 */
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-/* Hint : prebuild config  */
+
 void TIMER_voidWDTSleep(void)
 {
-	/* CLear The Prescaler bits  */
 	WDTCR &= WDT_PS_MASKING ;
-	/* Set The required prescaller */
 	WDTCR |= WDT_PRESCALER ;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 void TIMER_voidWDTEnable (void)
 {
 	SET_BIT (WDTCR , WDTCR_WDE);
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 void TIMER_voidWDTDisable (void)
 {
-	/* Set Bit 3&4 at the same CLK cycle  */
 	WDTCR |= 0b00011000 ;
-	/* WDTCR_WDE = 0 */
-	/* I don't care for any value in this Reg Cuz I want to Disable */
+	
 	WDTCR = 0 ;
 }
 
-//----------------------------------------------------------------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------------------------------------------------------------
 
 u8 TIMER_u8SetCallBack(void (*Copy_pvCallBackFunc)(void) , u8 Copy_u8VectorID)
 {
@@ -784,7 +698,6 @@ u8 TIMER_u8SetCallBack(void (*Copy_pvCallBackFunc)(void) , u8 Copy_u8VectorID)
 	return Local_u8ErrorState ;
 }
 
-/*TIMER0 Normal Mode ISR*/
 void __vector_11 (void)		__attribute__((signal)) ;
 void __vector_11 (void)
 {
@@ -794,7 +707,6 @@ void __vector_11 (void)
 	}
 }
 
-/*TIMER0 CTC Mode ISR*/
 void __vector_10 (void)		__attribute__((signal)) ;
 void __vector_10 (void)
 {
@@ -804,7 +716,6 @@ void __vector_10 (void)
 	}
 }
 
-/*TIMER1 Normal Mode ISR*/
 void __vector_9 (void)		__attribute__((signal)) ;
 void __vector_9 (void)
 {
@@ -814,7 +725,6 @@ void __vector_9 (void)
 	}
 }
 
-/*TIMER1 CTCB Mode ISR*/
 void __vector_8 (void)		__attribute__((signal)) ;
 void __vector_8 (void)
 {
@@ -824,7 +734,6 @@ void __vector_8 (void)
 	}
 }
 
-/*TIMER1 CTCA Mode ISR*/
 void __vector_7 (void)		__attribute__((signal)) ;
 void __vector_7 (void)
 {
@@ -834,7 +743,6 @@ void __vector_7 (void)
 	}
 }
 
-/*TIMER1 ICU ISR*/
 void __vector_6 (void)		__attribute__((signal)) ;
 void __vector_6 (void)
 {
@@ -844,7 +752,6 @@ void __vector_6 (void)
 	}
 }
 
-/*TIMER2 Normal Mode ISR*/
 void __vector_5 (void)		__attribute__((signal)) ;
 void __vector_5 (void)
 {
@@ -854,7 +761,6 @@ void __vector_5 (void)
 	}
 }
 
-/*TIMER2 CTC Mode ISR*/
 void __vector_4 (void)		__attribute__((signal)) ;
 void __vector_4 (void)
 {

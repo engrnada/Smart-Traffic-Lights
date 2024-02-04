@@ -1,18 +1,10 @@
-/*
- *<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<    TIMER_interface.h   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
- *
- *  Author : Mahmoud Karem Zamel
- *  Layer  : MCAL
- *  SWC    : Timer
- *
- */ 
+
  
 
 #ifndef TIMER_INTERFACE_H_
 #define TIMER_INTERFACE_H_
 
 
-/* Define indexes for the global pointer to func for ISR  */
 
 	#define TIMER0_OVF_VECTOR_ID		11
 	#define TIMER0_CTC_VECTOR_ID		10
@@ -43,7 +35,6 @@
 	void TIMER2_voidSetCTC (u8 Copy_u8CTC) ;
 	u8   TIMER2_u8GetTimerCounterValue (void) ;
 
-	/*******************************/
 
 	void TIMER_voidICUInitEnable(void);
 	u8   TIMER_voidICUSetTriggerEdge(u8 Copy_u8Edge);
